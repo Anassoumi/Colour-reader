@@ -1,0 +1,123 @@
+int RedLED=3;               //Declaration of RED LED pin (PWM), pin 3
+int GreenLED= 5;            //Declaration of GREEN LED pin (PWM), pin 5
+int BlueLED=6;              //Declaration of BLUE LED pin (PWM), pin6
+int LDRSensor; 
+float RedLDRReading[3];
+float GreenLDRReading[3];
+float BlueLDRReading[3];
+float REDLDRMeanValue;
+float GREENLDRMeanValue;
+float BLUELDRMeanValue; 
+float REDLDRStandardDeviation;
+float GREENLDRStandardDeviation;
+float BLUELDRStandardDeviation;
+
+
+//Also need other variables that I do not yet know. 
+float MeanValue=0.0;
+float StandardDeviation=0.0; 
+
+void setup() 
+{
+  Serial.begin(9600);
+  pinMode(RedLED, OUTPUT);    //RedLED is declared as an ouput pin
+  pinMode(GreenLED, OUTPUT);  //GreenLED is declared as an ouput pin
+  pinMode(BlueLED, OUTPUT);   //BlueLED is declared as an ouput pin
+}
+
+void loop() 
+{
+  
+  for(int i=0;i<3; i++)
+  {
+    analogWrite(RedLED, 255);     //Activate RED LED 
+    delay(100);                     //wait 5 msec
+    LDRSensor = analogRead(A0);
+    RedLDRReading[i] = (float)LDRSensor  * 5.0/1023.0;   //Read LDR when RED LED is activated.
+    delay(80);                     //wait 4 msec
+    analogWrite(RedLED, 0);       //Deactivate RED LED
+    delay(200);                    //wait 10 msec
+
+    analogWrite(GreenLED, 255);   //Activate GREEN LED 
+    delay(100);                     //wait 5 msec
+    LDRSensor = analogRead(A0);
+    GreenLDRReading[i] = (float)LDRSensor  * 5.0/1023.0;   //Read LDR when RED LED is activated.
+    delay(80);                     //wait 4 msec
+    analogWrite(GreenLED, 0);     //Deactivate GREEN LED
+    delay(200);                    //wait 10 msec
+
+
+    analogWrite(BlueLED, 255);    //Activate BLUE LED 
+    delay(100);                     //wait 5 msec
+    LDRSensor = analogRead(A0);
+    BlueLDRReading[i] = (float)LDRSensor  * 5.0/1023.0;   //Read LDR when RED LED is activated.
+    delay(80);                     //wait 4 msec
+    analogWrite(BlueLED, 0);      //Deactivate BLUE LED
+    delay(200);                    //wait 10 msec
+  }
+
+//Following code is for evaluating the mean value.
+  REDLDRMeanValue=(RedLDRReading[0]+RedLDRReading[1]+RedLDRReading[2])/3.0;         // Evaluate Red reading MeanValue
+  GREENLDRMeanValue=(GreenLDRReading[0]+GreenLDRReading[1]+GreenLDRReading[2])/3.0; // Evaluate Green reading MeanValue
+  BLUELDRMeanValue=(BlueLDRReading[0]+BlueLDRReading[1]+BlueLDRReading[2])/3.0;     // Evaluate Blue reading MeanValue
+
+  
+// Evaluate standdeviation
+REDLDRStandardDeviation=0.0;
+GREENLDRStandardDeviation=0.0;
+BLUELDRStandardDeviation=0.0;
+for(int i=0; i<3; i++)
+  REDLDRStandardDeviation+=pow((REDLDRMeanValue-RedLDRReading[i]), 2.0);
+ REDLDRStandardDeviation=pow((REDLDRStandardDeviation/2.0), 0.5);
+for(int i=0; i<3; i++)
+  GREENLDRStandardDeviation+=pow((GREENLDRMeanValue-GreenLDRReading[i]), 2.0);
+ GREENLDRStandardDeviation=pow((GREENLDRStandardDeviation/2.0), 0.5);
+ for(int i=0; i<3; i++)
+  BLUELDRStandardDeviation+=pow((BLUELDRMeanValue-BlueLDRReading[i]), 2.0);
+ BLUELDRStandardDeviation=pow((BLUELDRStandardDeviation/2.0), 0.5);
+
+/************************************************************************************************/
+//In the space below add the code for the Colour classification and identification. 
+ 
+
+/*Red value, Green value and Blue value below are from your experiments
+  if(((REDLDRMeanValue+REDLDRStandardDeviation>= Red value) && (REDLDRMeanValue-REDLDRStandardDeviation<= Red value)) &&
+      ((GREENLDRMeanValue+GREENLDRStandardDeviation>= Green value........ all yours
+*/
+if  ((REDLDRMeanValue+REDLDRStandardDeviation>= 2.34) && (REDLDRMeanValue-REDLDRStandardDeviation<= 2.45)
+     && (GREENLDRMeanValue+REDLDRStandardDeviation>= 4.00) && (GREENLDRMeanValue-GREENLDRStandardDeviation<= 4.30)
+     && (BLUELDRMeanValue+BLUELDRStandardDeviation>= 4.02) && (BLUELDRMeanValue-BLUELDRStandardDeviation<=4.50)) {
+Serial.print ("The coulour is Red ") ; }
+
+else if ((REDLDRMeanValue+REDLDRStandardDeviation>= 3.77) && (REDLDRMeanValue-REDLDRStandardDeviation<= 3.75)
+     && (GREENLDRMeanValue+REDLDRStandardDeviation>= 1.77) && (GREENLDRMeanValue-GREENLDRStandardDeviation<= 1.75)
+     && (BLUELDRMeanValue+BLUELDRStandardDeviation>= 3.74) && (BLUELDRMeanValue-BLUELDRStandardDeviation<= 3.72)) {
+Serial.print ("The colour is Green") ; }
+
+else if ((REDLDRMeanValue+REDLDRStandardDeviation>= 3.82) && (REDLDRMeanValue-REDLDRStandardDeviation<= 3.78)
+     && (GREENLDRMeanValue+REDLDRStandardDeviation>= 3.82) && (GREENLDRMeanValue-GREENLDRStandardDeviation<= 3.80)
+     && (BLUELDRMeanValue+BLUELDRStandardDeviation>= 1.85) && (BLUELDRMeanValue-BLUELDRStandardDeviation<= 1.83)) {
+Serial.print ("The colour is Blue") ; }
+
+else {
+Serial.print ("No colour is showing ") ;}
+
+
+//               Code above is for the colour classification and identification. 
+/************************************************************************************************/
+
+//Print REDmv, REDsd, GREENmv, GREENsd, BLUEmv and BLUEsd to screen
+  Serial.print("Red_MV:");
+  Serial.print(REDLDRMeanValue);
+  Serial.print("  Red_SD:");
+  Serial.print(REDLDRStandardDeviation);
+  Serial.print("      Green_MV:");
+  Serial.print(GREENLDRMeanValue);
+  Serial.print("  Green_SD:");
+  Serial.print(GREENLDRStandardDeviation);
+  Serial.print("      Blue_MV:");
+  Serial.print(BLUELDRMeanValue);
+  Serial.print("  Blue_SD:");
+  Serial.println(BLUELDRStandardDeviation);
+
+  delay(5000);     }               //wait 5 seconds
